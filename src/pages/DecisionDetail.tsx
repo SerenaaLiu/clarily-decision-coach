@@ -11,14 +11,38 @@ const mockDecisionData = {
     title: "Q4 Product Strategy Direction",
     meetingDate: "January 15, 2025",
     biases: [
-      { name: "Confirmation Bias", type: "bias" as const },
-      { name: "Optimism Bias", type: "bias" as const },
-      { name: "Anchoring Bias", type: "bias" as const }
+      { 
+        name: "Confirmation Bias", 
+        type: "bias" as const,
+        description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document."
+      },
+      { 
+        name: "Optimism Bias", 
+        type: "bias" as const,
+        description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document."
+      },
+      { 
+        name: "Anchoring Bias", 
+        type: "bias" as const,
+        description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives."
+      }
     ],
     mentalModels: [
-      { name: "Inversion Thinking", type: "model" as const },
-      { name: "First Principles", type: "model" as const },
-      { name: "Systems Thinking", type: "model" as const }
+      { 
+        name: "Inversion Thinking", 
+        type: "model" as const,
+        description: "Think about what could go wrong first to identify potential failure points before committing resources."
+      },
+      { 
+        name: "First Principles", 
+        type: "model" as const,
+        description: "Break down the problem to fundamental truths and build up solutions from basic components."
+      },
+      { 
+        name: "Systems Thinking", 
+        type: "model" as const,
+        description: "Consider how different parts of the business will interact and affect each other with this decision."
+      }
     ],
     framework: {
       name: "Pros & Cons Matrix",
@@ -129,19 +153,6 @@ export const DecisionDetail = () => {
           />
         </div>
 
-        {/* Meeting Transcript */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Full Meeting Transcript</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
-              <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono leading-relaxed">
-                {decision.transcript}
-              </pre>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

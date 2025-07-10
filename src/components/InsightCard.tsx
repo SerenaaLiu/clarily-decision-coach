@@ -5,6 +5,7 @@ import { Eye, Brain, CheckCircle } from "lucide-react";
 interface InsightItem {
   name: string;
   type: 'bias' | 'model' | 'framework';
+  description?: string;
 }
 
 interface InsightCardProps {
@@ -47,11 +48,16 @@ export const InsightCard = ({ title, items, icon }: InsightCardProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-2">
+        <ul className="space-y-4">
           {items.map((item, index) => (
-            <li key={index} className="flex items-center gap-3">
-              <div className={`w-2 h-2 rounded-full ${getDotColor(item.type)}`} />
-              <span className="text-gray-700">{item.name}</span>
+            <li key={index} className="flex items-start gap-3">
+              <div className={`w-2 h-2 rounded-full mt-2 ${getDotColor(item.type)}`} />
+              <div className="flex-1">
+                <span className="font-medium text-gray-900">{item.name}</span>
+                {item.description && (
+                  <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                )}
+              </div>
             </li>
           ))}
         </ul>
