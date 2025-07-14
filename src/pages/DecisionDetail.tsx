@@ -1,5 +1,6 @@
 
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InsightCard } from "@/components/InsightCard";
@@ -14,17 +15,20 @@ const mockDecisionData = {
       { 
         name: "Confirmation Bias", 
         type: "bias" as const,
-        description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document."
+        description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document.",
+        snippet: "I agree, the market research looks promising. We've seen similar products succeed."
       },
       { 
         name: "Optimism Bias", 
         type: "bias" as const,
-        description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document."
+        description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document.",
+        snippet: "I think we can achieve a 40% revenue increase if we execute well."
       },
       { 
         name: "Anchoring Bias", 
         type: "bias" as const,
-        description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives."
+        description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives.",
+        snippet: "What about the budget? We're looking at about $2M investment."
       }
     ],
     mentalModels: [
@@ -95,12 +99,40 @@ January 15, 2025
 export const DecisionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [highlightedText, setHighlightedText] = useState<string>("");
   
   const decision = mockDecisionData[Number(id) as keyof typeof mockDecisionData];
 
   if (!decision) {
     return <div>Decision not found</div>;
   }
+
+  const handleSnippetClick = (snippet: string) => {
+    setHighlightedText(snippet);
+    const transcriptElement = document.getElementById("transcript-section");
+    if (transcriptElement) {
+      transcriptElement.scrollIntoView({ behavior: "smooth" });
+      // Remove highlight after 3 seconds
+      setTimeout(() => setHighlightedText(""), 3000);
+    }
+  };
+
+  const highlightTranscript = (text: string) => {
+    if (!highlightedText) return text;
+    
+    const index = text.indexOf(highlightedText);
+    if (index === -1) return text;
+    
+    return (
+      <>
+        {text.substring(0, index)}
+        <span className="bg-yellow-200 px-1 py-0.5 rounded font-medium transition-colors duration-300">
+          {highlightedText}
+        </span>
+        {text.substring(index + highlightedText.length)}
+      </>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,6 +168,7 @@ export const DecisionDetail = () => {
               title="Detected Blind Spots"
               items={decision.biases}
               icon="eye"
+              onSnippetClick={handleSnippetClick}
             />
             <InsightCard
               title="Suggested Mental Models"
@@ -151,6 +184,22 @@ export const DecisionDetail = () => {
             name={decision.framework.name}
             content={decision.framework.content}
           />
+        </div>
+
+        {/* Full Meeting Transcript */}
+        <div id="transcript-section" className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Full Meeting Transcript
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="whitespace-pre-line text-sm text-gray-700 font-mono bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
+                {highlightTranscript(decision.transcript)}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
       </div>

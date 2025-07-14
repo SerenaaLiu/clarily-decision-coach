@@ -1,20 +1,23 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Brain, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Eye, Brain, CheckCircle, ExternalLink } from "lucide-react";
 
 interface InsightItem {
   name: string;
   type: 'bias' | 'model' | 'framework';
   description?: string;
+  snippet?: string;
 }
 
 interface InsightCardProps {
   title: string;
   items: InsightItem[];
   icon: 'eye' | 'brain' | 'check';
+  onSnippetClick?: (snippet: string) => void;
 }
 
-export const InsightCard = ({ title, items, icon }: InsightCardProps) => {
+export const InsightCard = ({ title, items, icon, onSnippetClick }: InsightCardProps) => {
   const getIcon = () => {
     switch (icon) {
       case 'eye':
@@ -56,6 +59,23 @@ export const InsightCard = ({ title, items, icon }: InsightCardProps) => {
                 <span className="font-medium text-gray-900">{item.name}</span>
                 {item.description && (
                   <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                )}
+                {item.snippet && onSnippetClick && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 mb-1">Example from meeting:</p>
+                    <div className="bg-gray-50 p-2 rounded text-xs text-gray-700 italic border border-gray-200">
+                      "{item.snippet}"
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onSnippetClick(item.snippet)}
+                      className="mt-1 h-6 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                    >
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      View in Transcript
+                    </Button>
+                  </div>
                 )}
               </div>
             </li>
