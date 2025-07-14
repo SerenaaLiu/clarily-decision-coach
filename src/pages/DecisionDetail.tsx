@@ -16,36 +16,39 @@ const mockDecisionData = {
         name: "Confirmation Bias", 
         type: "bias" as const,
         description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document.",
-        snippet: "I agree, the market research looks promising. We've seen similar products succeed."
+        snippet: "I agree, the market research looks promising. We've seen similar products succeed.",
+        recommendedModels: ["Inversion Thinking", "First Principles"]
       },
       { 
         name: "Optimism Bias", 
         type: "bias" as const,
         description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document.",
-        snippet: "I think we can achieve a 40% revenue increase if we execute well."
+        snippet: "I think we can achieve a 40% revenue increase if we execute well.",
+        recommendedModels: ["Inversion Thinking", "Systems Thinking"]
       },
       { 
         name: "Anchoring Bias", 
         type: "bias" as const,
         description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives.",
-        snippet: "What about the budget? We're looking at about $2M investment."
+        snippet: "What about the budget? We're looking at about $2M investment.",
+        recommendedModels: ["First Principles"]
       }
     ],
     mentalModels: [
       { 
         name: "Inversion Thinking", 
         type: "model" as const,
-        description: "Think about what could go wrong first to identify potential failure points before committing resources."
+        description: "Think about what could go wrong first to identify potential pitfalls. This often involves exploring worst-case scenarios and systematically examining failure modes before committing to a decision."
       },
       { 
         name: "First Principles", 
         type: "model" as const,
-        description: "Break down the problem to fundamental truths and build up solutions from basic components."
+        description: "Break down complex problems to their fundamental truths and build up solutions from basic components. This involves questioning assumptions and reasoning from foundational elements rather than analogy."
       },
       { 
         name: "Systems Thinking", 
         type: "model" as const,
-        description: "Consider how different parts of the business will interact and affect each other with this decision."
+        description: "Consider how different parts of the business will interact and affect each other with this decision. This involves understanding feedback loops, unintended consequences, and holistic impact across the organization."
       }
     ],
     framework: {
@@ -99,7 +102,7 @@ January 15, 2025
 export const DecisionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [highlightedText, setHighlightedText] = useState<string>("");
+  const [highlightedModel, setHighlightedModel] = useState<string>("");
   
   const decision = mockDecisionData[Number(id) as keyof typeof mockDecisionData];
 
@@ -117,6 +120,17 @@ export const DecisionDetail = () => {
     }
   };
 
+  const handleModelClick = (modelName: string) => {
+    setHighlightedModel(modelName);
+    const modelElement = document.getElementById(`model-${modelName.replace(/\s+/g, '-').toLowerCase()}`);
+    if (modelElement) {
+      modelElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      // Remove highlight after 3 seconds
+      setTimeout(() => setHighlightedModel(""), 3000);
+    }
+  };
+
+  const [highlightedText, setHighlightedText] = useState<string>("");
   const highlightTranscript = (text: string) => {
     if (!highlightedText) return text;
     
@@ -169,11 +183,13 @@ export const DecisionDetail = () => {
               items={decision.biases}
               icon="eye"
               onSnippetClick={handleSnippetClick}
+              onModelClick={handleModelClick}
             />
             <InsightCard
               title="Suggested Mental Models"
               items={decision.mentalModels}
               icon="brain"
+              highlightedModel={highlightedModel}
             />
           </div>
         </div>

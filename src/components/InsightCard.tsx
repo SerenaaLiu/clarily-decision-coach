@@ -8,6 +8,7 @@ interface InsightItem {
   type: 'bias' | 'model' | 'framework';
   description?: string;
   snippet?: string;
+  recommendedModels?: string[];
 }
 
 interface InsightCardProps {
@@ -15,9 +16,11 @@ interface InsightCardProps {
   items: InsightItem[];
   icon: 'eye' | 'brain' | 'check';
   onSnippetClick?: (snippet: string) => void;
+  onModelClick?: (modelName: string) => void;
+  highlightedModel?: string;
 }
 
-export const InsightCard = ({ title, items, icon, onSnippetClick }: InsightCardProps) => {
+export const InsightCard = ({ title, items, icon, onSnippetClick, onModelClick, highlightedModel }: InsightCardProps) => {
   const getIcon = () => {
     switch (icon) {
       case 'eye':
@@ -53,13 +56,40 @@ export const InsightCard = ({ title, items, icon, onSnippetClick }: InsightCardP
       <CardContent>
         <ul className="space-y-4">
           {items.map((item, index) => (
-            <li key={index} className="flex items-start gap-3">
+            <li 
+              key={index} 
+              id={item.type === 'model' ? `model-${item.name.replace(/\s+/g, '-').toLowerCase()}` : undefined}
+              className={`flex items-start gap-3 p-2 rounded transition-colors duration-300 ${
+                highlightedModel === item.name ? 'bg-blue-50 border border-blue-200' : ''
+              }`}
+            >
               <div className={`w-2 h-2 rounded-full mt-2 ${getDotColor(item.type)}`} />
               <div className="flex-1">
                 <span className="font-medium text-gray-900">{item.name}</span>
                 {item.description && (
                   <p className="text-sm text-gray-600 mt-1">{item.description}</p>
                 )}
+                
+                {/* Show recommended mental models for biases */}
+                {item.recommendedModels && onModelClick && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 mb-1">To counter this, consider:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {item.recommendedModels.map((model, modelIndex) => (
+                        <Button
+                          key={modelIndex}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onModelClick(model)}
+                          className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 border-blue-200"
+                        >
+                          {model}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {item.snippet && onSnippetClick && (
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 mb-1">Example from meeting:</p>
@@ -69,7 +99,7 @@ export const InsightCard = ({ title, items, icon, onSnippetClick }: InsightCardP
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onSnippetClick(item.snippet)}
+                      onClick={() => onSnippetClick(item.snippet!)}
                       className="mt-1 h-6 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                     >
                       <ExternalLink className="h-3 w-3 mr-1" />
