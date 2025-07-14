@@ -10,23 +10,9 @@ interface FrameworkCardProps {
     criteria?: { name: string; score: number }[];
     steps?: string[];
   };
-  counters?: string[];
-  supports?: string[];
 }
 
-const scrollToSection = (elementName: string) => {
-  const element = document.getElementById(elementName.toLowerCase().replace(/\s+/g, '-'));
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // Briefly highlight the target section
-    element.classList.add('ring-2', 'ring-blue-500', 'ring-opacity-50');
-    setTimeout(() => {
-      element.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50');
-    }, 2000);
-  }
-};
-
-export const FrameworkCard = ({ name, content, counters = ["Confirmation Bias", "Anchoring Bias"], supports = ["Inversion Thinking", "First Principles"] }: FrameworkCardProps) => {
+export const FrameworkCard = ({ name, content }: FrameworkCardProps) => {
   const renderProsConsMatrix = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
@@ -94,7 +80,7 @@ export const FrameworkCard = ({ name, content, counters = ["Confirmation Bias", 
   };
 
   return (
-    <Card id={name.toLowerCase().replace(/\s+/g, '-')}>
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <CheckCircle className="h-5 w-5 text-green-600" />
@@ -104,36 +90,6 @@ export const FrameworkCard = ({ name, content, counters = ["Confirmation Bias", 
       </CardHeader>
       <CardContent>
         {renderContent()}
-        
-        {/* Framework connections */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-600">
-            This <span className="font-medium">{name}</span> helps counter{' '}
-            {counters.map((bias, idx) => (
-              <span key={idx}>
-                <button
-                  onClick={() => scrollToSection(bias)}
-                  className="text-orange-600 underline hover:text-orange-800 cursor-pointer"
-                >
-                  {bias}
-                </button>
-                {idx < counters.length - 1 && ', '}
-              </span>
-            ))}
-            {' '}and supports{' '}
-            {supports.map((model, idx) => (
-              <span key={idx}>
-                <button
-                  onClick={() => scrollToSection(model)}
-                  className="text-blue-600 underline hover:text-blue-800 cursor-pointer"
-                >
-                  {model}
-                </button>
-                {idx < supports.length - 1 && ', '}
-              </span>
-            ))}
-          </p>
-        </div>
       </CardContent>
     </Card>
   );

@@ -14,40 +14,34 @@ const mockDecisionData = {
       { 
         name: "Confirmation Bias", 
         type: "bias" as const,
-        description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document.",
-        counters: ["Inversion Thinking", "Pros & Cons Matrix"]
+        description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document."
       },
       { 
         name: "Optimism Bias", 
         type: "bias" as const,
-        description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document.",
-        counters: ["Inversion Thinking", "Systems Thinking"]
+        description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document."
       },
       { 
         name: "Anchoring Bias", 
         type: "bias" as const,
-        description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives.",
-        counters: ["First Principles", "Pros & Cons Matrix"]
+        description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives."
       }
     ],
     mentalModels: [
       { 
         name: "Inversion Thinking", 
         type: "model" as const,
-        description: "Think about what could go wrong first to identify potential failure points before committing resources.",
-        framework: "Pros & Cons Matrix"
+        description: "Think about what could go wrong first to identify potential failure points before committing resources."
       },
       { 
         name: "First Principles", 
         type: "model" as const,
-        description: "Break down the problem to fundamental truths and build up solutions from basic components.",
-        framework: "Pros & Cons Matrix"
+        description: "Break down the problem to fundamental truths and build up solutions from basic components."
       },
       { 
         name: "Systems Thinking", 
         type: "model" as const,
-        description: "Consider how different parts of the business will interact and affect each other with this decision.",
-        framework: "Pros & Cons Matrix"
+        description: "Consider how different parts of the business will interact and affect each other with this decision."
       }
     ],
     framework: {
@@ -138,20 +132,16 @@ export const DecisionDetail = () => {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Core Clarily Insights from Meeting</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div id="detected-blind-spots">
-              <InsightCard
-                title="Detected Blind Spots"
-                items={decision.biases}
-                icon="eye"
-              />
-            </div>
-            <div id="suggested-mental-models">
-              <InsightCard
-                title="Suggested Mental Models"
-                items={decision.mentalModels}
-                icon="brain"
-              />
-            </div>
+            <InsightCard
+              title="Detected Blind Spots"
+              items={decision.biases}
+              icon="eye"
+            />
+            <InsightCard
+              title="Suggested Mental Models"
+              items={decision.mentalModels}
+              icon="brain"
+            />
           </div>
         </div>
 
