@@ -202,6 +202,40 @@ export const DecisionDetail = () => {
           />
         </div>
 
+        {/* Guiding Questions */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Guiding Questions for Your Next Discussion
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Based on our analysis of this meeting, consider these questions to enhance your team's judgment in the next session:
+              </p>
+              <ul className="space-y-3 text-sm text-gray-700">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-medium">•</span>
+                  <span>How can we actively seek out and discuss information that challenges our current preferred solution?</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-medium">•</span>
+                  <span>What are the potential worst-case scenarios for this decision, and what steps can we take to mitigate them?</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-medium">•</span>
+                  <span>Are we truly breaking down this problem to its fundamental components, or are we relying on assumptions from past similar situations?</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-medium">•</span>
+                  <span>What are the potential unintended consequences of this decision on other departments or long-term goals?</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Full Meeting Transcript */}
         <div id="transcript-section" className="mb-8">
           <Card>
