@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DecisionCard } from "@/components/DecisionCard";
-import { Plus } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const mockInProgressDecisions = [
   {
@@ -43,9 +44,55 @@ const mockCompletedDecisions = [
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleDecisionClick = (id: number) => {
     navigate(`/decision/${id}`);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    
+    try {
+      const fileContent = await file.text();
+      
+      const response = await fetch('https://clarily-backend-temp.onrender.com/analyze_meeting_transcript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcript: fileContent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze transcript');
+      }
+
+      const result = await response.json();
+      
+      toast({
+        title: "Transcript Analyzed",
+        description: "Your meeting transcript has been successfully analyzed.",
+      });
+
+      console.log('Analysis result:', result);
+      
+    } catch (error) {
+      console.error('Error uploading transcript:', error);
+      toast({
+        title: "Upload Failed",
+        description: "There was an error analyzing your transcript. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -57,10 +104,23 @@ export const Dashboard = () => {
             <h1 className="text-3xl font-bold text-gray-900">My Decisions</h1>
             <p className="text-gray-600 mt-1">Track and analyze your strategic decisions</p>
           </div>
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            New Decision
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              id="transcript-upload"
+              accept=".txt,.md"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button 
+              className="flex items-center gap-2"
+              onClick={() => document.getElementById('transcript-upload')?.click()}
+              disabled={isUploading}
+            >
+              <Upload className="h-4 w-4" />
+              {isUploading ? 'Analyzing...' : 'Upload Transcript'}
+            </Button>
+          </div>
         </div>
 
         {/* In Progress Decisions */}
