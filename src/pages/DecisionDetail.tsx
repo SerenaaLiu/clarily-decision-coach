@@ -11,10 +11,17 @@ const mockDecisionData = {
   1: {
     title: "Q4 Product Strategy Direction",
     meetingDate: "January 15, 2025",
+    summary: {
+      total_blind_spots: 3,
+      high_severity_count: 2,
+      frameworks_recommended: 1,
+      mental_models_recommended: 3
+    },
     biases: [
       { 
         name: "Confirmation Bias", 
         type: "bias" as const,
+        severity: "high" as const,
         description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document.",
         snippet: "I agree, the market research looks promising. We've seen similar products succeed.",
         recommendedModels: ["Inversion Thinking", "First Principles"]
@@ -22,6 +29,7 @@ const mockDecisionData = {
       { 
         name: "Optimism Bias", 
         type: "bias" as const,
+        severity: "high" as const,
         description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document.",
         snippet: "I think we can achieve a 40% revenue increase if we execute well.",
         recommendedModels: ["Inversion Thinking", "Systems Thinking"]
@@ -29,6 +37,7 @@ const mockDecisionData = {
       { 
         name: "Anchoring Bias", 
         type: "bias" as const,
+        severity: "medium" as const,
         description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives.",
         snippet: "What about the budget? We're looking at about $2M investment.",
         recommendedModels: ["First Principles"]
@@ -38,21 +47,32 @@ const mockDecisionData = {
       { 
         name: "Inversion Thinking", 
         type: "model" as const,
-        description: "Think about what could go wrong first to identify potential pitfalls. This often involves exploring worst-case scenarios and systematically examining failure modes before committing to a decision."
+        description: "Think about what could go wrong first to identify potential pitfalls. This often involves exploring worst-case scenarios and systematically examining failure modes before committing to a decision.",
+        process: "Develop best/worst/most likely scenarios"
       },
       { 
         name: "First Principles", 
         type: "model" as const,
-        description: "Break down complex problems to their fundamental truths and build up solutions from basic components. This involves questioning assumptions and reasoning from foundational elements rather than analogy."
+        description: "Break down complex problems to their fundamental truths and build up solutions from basic components. This involves questioning assumptions and reasoning from foundational elements rather than analogy.",
+        process: "Question core assumptions and build from foundational elements"
       },
       { 
         name: "Systems Thinking", 
         type: "model" as const,
-        description: "Consider how different parts of the business will interact and affect each other with this decision. This involves understanding feedback loops, unintended consequences, and holistic impact across the organization."
+        description: "Consider how different parts of the business will interact and affect each other with this decision. This involves understanding feedback loops, unintended consequences, and holistic impact across the organization.",
+        process: "Map interconnections and feedback loops"
       }
     ],
     framework: {
       name: "Pros & Cons Matrix",
+      description: "A structured decision-making tool that systematically lists positive and negative aspects of a choice.",
+      why_recommended: "Addresses: Confirmation Bias, Optimism Bias",
+      how_to_use: [
+        "List all potential positive outcomes in the 'Pros' column",
+        "List all potential negative outcomes in the 'Cons' column",
+        "Assign weights to each item based on importance",
+        "Compare weighted totals to inform your decision"
+      ],
       content: {
         pros: [
           "Strong market demand for our product category",
@@ -68,6 +88,12 @@ const mockDecisionData = {
         ]
       }
     },
+    guiding_questions_for_next_discussion: [
+      "How can we actively seek out and discuss information that challenges our current preferred solution?",
+      "What are the potential worst-case scenarios for this decision, and what steps can we take to mitigate them?",
+      "Are we truly breaking down this problem to its fundamental components, or are we relying on assumptions from past similar situations?",
+      "What are the potential unintended consequences of this decision on other departments or long-term goals?"
+    ],
     transcript: `Meeting Transcript - Q4 Product Strategy Direction
 January 15, 2025
 
@@ -174,6 +200,35 @@ export const DecisionDetail = () => {
           </CardHeader>
         </Card>
 
+        {/* Summary */}
+        <Card className="mb-8 bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-blue-900">
+              Analysis Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-blue-700">{decision.summary.total_blind_spots}</div>
+                <div className="text-sm text-blue-600">Blind Spots</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-700">{decision.summary.high_severity_count}</div>
+                <div className="text-sm text-red-600">High Severity</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-700">{decision.summary.frameworks_recommended}</div>
+                <div className="text-sm text-green-600">Frameworks</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-purple-700">{decision.summary.mental_models_recommended}</div>
+                <div className="text-sm text-purple-600">Mental Models</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Core Insights */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Core Clarily Insights from Meeting</h2>
@@ -196,10 +251,36 @@ export const DecisionDetail = () => {
 
         {/* Generated Framework */}
         <div className="mb-8">
-          <FrameworkCard
-            name={decision.framework.name}
-            content={decision.framework.content}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Generated Framework: {decision.framework.name}
+              </CardTitle>
+              <p className="text-gray-600 text-sm mt-2">{decision.framework.description}</p>
+              <div className="bg-blue-50 text-blue-800 text-sm px-3 py-2 rounded-lg mt-3 font-medium">
+                {decision.framework.why_recommended}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <h4 className="font-semibold text-gray-900 mb-3">How to Use:</h4>
+                <ol className="space-y-2">
+                  {decision.framework.how_to_use.map((step, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full min-w-[24px] text-center">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm text-gray-700">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <FrameworkCard
+                name={decision.framework.name}
+                content={decision.framework.content}
+              />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Guiding Questions */}
@@ -215,22 +296,12 @@ export const DecisionDetail = () => {
                 Based on our analysis of this meeting, consider these questions to enhance your team's judgment in the next session:
               </p>
               <ul className="space-y-3 text-sm text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-medium">•</span>
-                  <span>How can we actively seek out and discuss information that challenges our current preferred solution?</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-medium">•</span>
-                  <span>What are the potential worst-case scenarios for this decision, and what steps can we take to mitigate them?</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-medium">•</span>
-                  <span>Are we truly breaking down this problem to its fundamental components, or are we relying on assumptions from past similar situations?</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-medium">•</span>
-                  <span>What are the potential unintended consequences of this decision on other departments or long-term goals?</span>
-                </li>
+                {decision.guiding_questions_for_next_discussion.map((question, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-blue-600 font-medium">•</span>
+                    <span>{question}</span>
+                  </li>
+                ))}
               </ul>
             </CardContent>
           </Card>

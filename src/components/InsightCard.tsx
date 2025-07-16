@@ -9,6 +9,8 @@ interface InsightItem {
   description?: string;
   snippet?: string;
   recommendedModels?: string[];
+  severity?: 'high' | 'medium' | 'low';
+  process?: string;
 }
 
 interface InsightCardProps {
@@ -45,6 +47,19 @@ export const InsightCard = ({ title, items, icon, onSnippetClick, onModelClick, 
     }
   };
 
+  const getSeverityColor = (severity?: string): string => {
+    switch (severity) {
+      case 'high':
+        return 'bg-red-500';
+      case 'medium':
+        return 'bg-orange-500';
+      case 'low':
+        return 'bg-gray-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -63,11 +78,23 @@ export const InsightCard = ({ title, items, icon, onSnippetClick, onModelClick, 
                 highlightedModel === item.name ? 'bg-blue-50 border border-blue-200' : ''
               }`}
             >
-              <div className={`w-2 h-2 rounded-full mt-2 ${getDotColor(item.type)}`} />
+              <div className={`w-2 h-2 rounded-full mt-2 ${item.severity ? getSeverityColor(item.severity) : getDotColor(item.type)}`} />
               <div className="flex-1">
-                <span className="font-medium text-gray-900">{item.name}</span>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-medium text-gray-900">{item.name}</span>
+                  {item.severity && (
+                    <span className={`text-xs px-2 py-1 rounded-full text-white ${getSeverityColor(item.severity)}`}>
+                      {item.severity}
+                    </span>
+                  )}
+                </div>
                 {item.description && (
                   <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                )}
+                {item.process && (
+                  <div className="mt-2 bg-gray-50 p-2 rounded text-xs text-gray-700">
+                    <span className="font-medium">Process: </span>{item.process}
+                  </div>
                 )}
                 
                 {/* Show recommended mental models for biases */}
