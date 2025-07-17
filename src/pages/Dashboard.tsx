@@ -6,39 +6,21 @@ import { Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
-const mockInProgressDecisions = [
+const mockDecisions = [
   {
     id: 1,
     title: "Q4 Product Strategy Direction",
-    lastActivity: "January 15, 2025",
-    status: "Ongoing"
+    lastActivity: "January 15, 2025"
   },
   {
     id: 2,
     title: "Company X Acquisition Target",
-    lastActivity: "January 12, 2025",
-    status: "Review Phase"
+    lastActivity: "January 12, 2025"
   },
   {
     id: 3,
     title: "Market Expansion Initiative",
-    lastActivity: "January 10, 2025",
-    status: "Ongoing"
-  }
-];
-
-const mockCompletedDecisions = [
-  {
-    id: 4,
-    title: "Q3 Budget Allocation",
-    lastActivity: "December 20, 2024",
-    status: "Completed"
-  },
-  {
-    id: 5,
-    title: "Team Restructuring Plan",
-    lastActivity: "December 15, 2024",
-    status: "Completed"
+    lastActivity: "January 10, 2025"
   }
 ];
 
@@ -46,9 +28,18 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
+  const [decisions, setDecisions] = useState(mockDecisions);
 
   const handleDecisionClick = (id: number) => {
     navigate(`/decision/${id}`);
+  };
+
+  const handleArchiveDecision = (id: number) => {
+    setDecisions(decisions.filter(decision => decision.id !== id));
+    toast({
+      title: "Decision Archived",
+      description: "The decision has been moved to archived decisions.",
+    });
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,34 +123,16 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* In Progress Decisions */}
-        <div className="mb-10">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">In Progress</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockInProgressDecisions.map((decision) => (
-              <DecisionCard
-                key={decision.id}
-                title={decision.title}
-                lastActivity={decision.lastActivity}
-                status={decision.status}
-                onClick={() => handleDecisionClick(decision.id)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Completed Decisions */}
+        {/* All Decisions */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Completed Decisions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockCompletedDecisions.map((decision) => (
+            {decisions.map((decision) => (
               <DecisionCard
                 key={decision.id}
                 title={decision.title}
                 lastActivity={decision.lastActivity}
-                status={decision.status}
-                isCompleted={true}
                 onClick={() => handleDecisionClick(decision.id)}
+                onArchive={() => handleArchiveDecision(decision.id)}
               />
             ))}
           </div>
@@ -167,7 +140,7 @@ export const Dashboard = () => {
 
         {/* View All Link */}
         <div className="text-center">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => navigate('/archived')}>
             View All Past Decisions
           </Button>
         </div>

@@ -1,39 +1,44 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Archive } from "lucide-react";
 
 interface DecisionCardProps {
   title: string;
   lastActivity: string;
-  status: string;
-  isCompleted?: boolean;
   onClick: () => void;
+  onArchive: () => void;
 }
 
-export const DecisionCard = ({ title, lastActivity, status, isCompleted = false, onClick }: DecisionCardProps) => {
+export const DecisionCard = ({ title, lastActivity, onClick, onArchive }: DecisionCardProps) => {
+  const handleArchive = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onArchive();
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer" onClick={onClick}>
+    <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer relative" onClick={onClick}>
       <CardContent className="p-6">
-        <div className="space-y-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-2 right-2 h-8 w-8 p-0 opacity-60 hover:opacity-100"
+          onClick={handleArchive}
+        >
+          <Archive className="h-4 w-4" />
+        </Button>
+        
+        <div className="space-y-3 pr-8">
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
             {title}
           </h3>
           
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-sm text-gray-600">
-                {isCompleted ? "Completed:" : "Last Meeting:"} {lastActivity}
-              </p>
-              <Badge 
-                variant={isCompleted ? "secondary" : "default"}
-                className={isCompleted ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"}
-              >
-                {status}
-              </Badge>
-            </div>
+            <p className="text-sm text-gray-600">
+              Last Meeting: {lastActivity}
+            </p>
             
-            <Button variant="outline" size="sm" className="ml-4">
+            <Button variant="outline" size="sm">
               View Details
             </Button>
           </div>
