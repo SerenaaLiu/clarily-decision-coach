@@ -56,10 +56,10 @@ export const Dashboard = () => {
     if (!file) return;
 
     setIsUploading(true);
-    
+
     try {
       const fileContent = await file.text();
-      
+
       const response = await fetch('https://clarily-backend-temp.onrender.com/analyze_meeting_transcript', {
         method: 'POST',
         headers: {
@@ -75,14 +75,23 @@ export const Dashboard = () => {
       }
 
       const result = await response.json();
-      
+
       toast({
         title: "Transcript Analyzed",
         description: "Your meeting transcript has been successfully analyzed.",
       });
 
-      console.log('Analysis result:', result);
-      
+      // Generate a temporary id for the new decision (e.g., timestamp)
+      const newId = Date.now();
+      // Navigate to DecisionDetail and pass backend data as state
+      navigate(`/decision/${newId}`, {
+        state: {
+          decisionData: result,
+          generatedId: newId,
+          transcript: fileContent // Include the original transcript
+        }
+      });
+
     } catch (error) {
       console.error('Error uploading transcript:', error);
       toast({
@@ -112,7 +121,7 @@ export const Dashboard = () => {
               onChange={handleFileUpload}
               className="hidden"
             />
-            <Button 
+            <Button
               className="flex items-center gap-2"
               onClick={() => document.getElementById('transcript-upload')?.click()}
               disabled={isUploading}

@@ -1,5 +1,5 @@
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,24 +18,24 @@ const mockDecisionData = {
       mental_models_recommended: 3
     },
     biases: [
-      { 
-        name: "Confirmation Bias", 
+      {
+        name: "Confirmation Bias",
         type: "bias" as const,
         severity: "high" as const,
         description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document.",
         snippet: "I agree, the market research looks promising. We've seen similar products succeed.",
         recommendedModels: ["Inversion Thinking", "First Principles"]
       },
-      { 
-        name: "Optimism Bias", 
+      {
+        name: "Optimism Bias",
         type: "bias" as const,
         severity: "high" as const,
         description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document.",
         snippet: "I think we can achieve a 40% revenue increase if we execute well.",
         recommendedModels: ["Inversion Thinking", "Systems Thinking"]
       },
-      { 
-        name: "Anchoring Bias", 
+      {
+        name: "Anchoring Bias",
         type: "bias" as const,
         severity: "medium" as const,
         description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives.",
@@ -44,20 +44,20 @@ const mockDecisionData = {
       }
     ],
     mentalModels: [
-      { 
-        name: "Inversion Thinking", 
+      {
+        name: "Inversion Thinking",
         type: "model" as const,
         description: "Think about what could go wrong first to identify potential pitfalls. This often involves exploring worst-case scenarios and systematically examining failure modes before committing to a decision.",
         process: "Develop best/worst/most likely scenarios"
       },
-      { 
-        name: "First Principles", 
+      {
+        name: "First Principles",
         type: "model" as const,
         description: "Break down complex problems to their fundamental truths and build up solutions from basic components. This involves questioning assumptions and reasoning from foundational elements rather than analogy.",
         process: "Question core assumptions and build from foundational elements"
       },
-      { 
-        name: "Systems Thinking", 
+      {
+        name: "Systems Thinking",
         type: "model" as const,
         description: "Consider how different parts of the business will interact and affect each other with this decision. This involves understanding feedback loops, unintended consequences, and holistic impact across the organization.",
         process: "Map interconnections and feedback loops"
@@ -127,9 +127,69 @@ January 15, 2025
 export const DecisionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [highlightedModel, setHighlightedModel] = useState<string>("");
-  
-  const decision = mockDecisionData[Number(id) as keyof typeof mockDecisionData];
+
+  // If coming from upload, use backend data from navigation state
+  const backendDecision = location.state?.decisionData;
+  const originalTranscript = location.state?.transcript;
+
+  // Helper to map backend data to frontend structure
+  function mapBackendToFrontend(data: any) {
+    if (!data) return undefined;
+    // Map detected_blind_spots to biases
+    const biases = (data.detected_blind_spots || []).map((b: any) => ({
+      name: b.name,
+      type: "bias",
+      severity: b.severity || "medium",
+      description: b.explanation || b.definition,
+      snippet: b.example_snippet,
+      recommendedModels: b.recommended_models || [],
+    }));
+    // Map mental_models
+    const mentalModels = (data.mental_models || []).map((m: any) => ({
+      name: m.name,
+      type: "model",
+      description: m.definition,
+      process: m.process,
+      addresses_bias: m.addresses_bias,
+    }));
+    // Map frameworks (pick first for now)
+    let framework = undefined;
+    if (Array.isArray(data.generated_frameworks) && data.generated_frameworks.length > 0) {
+      const fw = data.generated_frameworks[0];
+      framework = {
+        name: fw.name,
+        description: fw.description,
+        why_recommended: fw.why_recommended,
+        how_to_use: fw.how_to_use
+          ? fw.how_to_use.split(/\d+\. /).filter(Boolean)
+          : [],
+        content: fw.template || {},
+      };
+    }
+    // Compose summary
+    const summary = data.summary || {
+      total_blind_spots: biases.length,
+      high_severity_count: biases.filter((b: any) => b.severity === "high").length,
+      frameworks_recommended: (data.generated_frameworks || []).length,
+      mental_models_recommended: (data.mental_models || []).length,
+    };
+    return {
+      title: data.title || "Uploaded Decision Analysis",
+      meetingDate: data.meeting_date || new Date().toLocaleDateString(),
+      summary,
+      biases,
+      mentalModels,
+      framework,
+      guiding_questions_for_next_discussion: data.guiding_questions_for_next_discussion || [],
+      transcript: originalTranscript || "(Transcript not available)",
+    };
+  }
+
+  const decision = backendDecision
+    ? mapBackendToFrontend(backendDecision)
+    : mockDecisionData[Number(id) as keyof typeof mockDecisionData];
 
   if (!decision) {
     return <div>Decision not found</div>;
@@ -158,10 +218,10 @@ export const DecisionDetail = () => {
   const [highlightedText, setHighlightedText] = useState<string>("");
   const highlightTranscript = (text: string) => {
     if (!highlightedText) return text;
-    
+
     const index = text.indexOf(highlightedText);
     if (index === -1) return text;
-    
+
     return (
       <>
         {text.substring(0, index)}
@@ -177,8 +237,8 @@ export const DecisionDetail = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center gap-2 hover:bg-gray-100"
         >
