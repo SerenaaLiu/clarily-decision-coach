@@ -1,5 +1,4 @@
-
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -129,67 +128,9 @@ export const DecisionDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [highlightedModel, setHighlightedModel] = useState<string>("");
-
-  // If coming from upload, use backend data from navigation state
-  const backendDecision = location.state?.decisionData;
-  const originalTranscript = location.state?.transcript;
-
-  // Helper to map backend data to frontend structure
-  function mapBackendToFrontend(data: any) {
-    if (!data) return undefined;
-    // Map detected_blind_spots to biases
-    const biases = (data.detected_blind_spots || []).map((b: any) => ({
-      name: b.name,
-      type: "bias",
-      severity: b.severity || "medium",
-      description: b.explanation || b.definition,
-      snippet: b.example_snippet,
-      recommendedModels: b.recommended_models || [],
-    }));
-    // Map mental_models
-    const mentalModels = (data.mental_models || []).map((m: any) => ({
-      name: m.name,
-      type: "model",
-      description: m.definition,
-      process: m.process,
-      addresses_bias: m.addresses_bias,
-    }));
-    // Map frameworks (pick first for now)
-    let framework = undefined;
-    if (Array.isArray(data.generated_frameworks) && data.generated_frameworks.length > 0) {
-      const fw = data.generated_frameworks[0];
-      framework = {
-        name: fw.name,
-        description: fw.description,
-        why_recommended: fw.why_recommended,
-        how_to_use: fw.how_to_use
-          ? fw.how_to_use.split(/\d+\. /).filter(Boolean)
-          : [],
-        content: fw.template || {},
-      };
-    }
-    // Compose summary
-    const summary = data.summary || {
-      total_blind_spots: biases.length,
-      high_severity_count: biases.filter((b: any) => b.severity === "high").length,
-      frameworks_recommended: (data.generated_frameworks || []).length,
-      mental_models_recommended: (data.mental_models || []).length,
-    };
-    return {
-      title: data.title || "Uploaded Decision Analysis",
-      meetingDate: data.meeting_date || new Date().toLocaleDateString(),
-      summary,
-      biases,
-      mentalModels,
-      framework,
-      guiding_questions_for_next_discussion: data.guiding_questions_for_next_discussion || [],
-      transcript: originalTranscript || "(Transcript not available)",
-    };
-  }
-
-  const decision = backendDecision
-    ? mapBackendToFrontend(backendDecision)
-    : mockDecisionData[Number(id) as keyof typeof mockDecisionData];
+  const [highlightedText, setHighlightedText] = useState<string>("");
+  
+  const decision = mockDecisionData[Number(id) as keyof typeof mockDecisionData];
 
   if (!decision) {
     return <div>Decision not found</div>;
@@ -215,7 +156,6 @@ export const DecisionDetail = () => {
     }
   };
 
-  const [highlightedText, setHighlightedText] = useState<string>("");
   const highlightTranscript = (text: string) => {
     if (!highlightedText) return text;
 
