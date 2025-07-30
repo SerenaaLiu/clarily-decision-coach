@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, Brain, CheckCircle, ExternalLink } from "lucide-react";
 
-interface InsightItem {
+export interface InsightItem {
   name: string;
-  type: 'bias' | 'model' | 'framework';
-  description?: string;
+  type: 'blind_spot' | 'model' | 'framework';
+  severity?: 'low' | 'medium' | 'high';
+  description: string;
   snippet?: string;
   recommendedModels?: string[];
-  severity?: 'high' | 'medium' | 'low';
   process?: string;
 }
 
@@ -36,7 +36,7 @@ export const InsightCard = ({ title, items, icon, onSnippetClick, onModelClick, 
 
   const getDotColor = (type: string) => {
     switch (type) {
-      case 'bias':
+      case 'blind_spot':
         return 'bg-orange-500';
       case 'model':
         return 'bg-blue-500';
@@ -97,7 +97,7 @@ export const InsightCard = ({ title, items, icon, onSnippetClick, onModelClick, 
                   </div>
                 )}
                 
-                {/* Show recommended mental models for biases */}
+                {/* Show recommended mental models for blind spots */}
                 {item.recommendedModels && onModelClick && (
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 mb-1">To counter this, consider:</p>

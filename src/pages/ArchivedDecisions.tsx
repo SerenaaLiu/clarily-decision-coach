@@ -53,7 +53,9 @@ export const ArchivedDecisions = () => {
   const [archivedDecisions, setArchivedDecisions] = useState(mockArchivedDecisions);
 
   const handleDecisionClick = (id: number) => {
-    navigate(`/decision/${id}`);
+    // For archived decisions, we'll assume they belong to project 1 for now
+    // In a real app, you'd store the projectId with each decision
+    navigate(`/project/1/decision/${id}`);
   };
 
   const handleUnarchiveDecision = (id: number) => {

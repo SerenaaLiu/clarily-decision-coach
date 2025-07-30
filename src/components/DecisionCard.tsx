@@ -5,6 +5,8 @@ import { Archive, ArchiveRestore } from "lucide-react";
 interface DecisionCardProps {
   title: string;
   lastActivity: string;
+  status?: string;
+  isCompleted?: boolean;
   onClick: () => void;
   onArchive?: () => void;
   onUnarchive?: () => void;

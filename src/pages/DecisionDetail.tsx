@@ -16,26 +16,26 @@ const mockDecisionData = {
       frameworks_recommended: 1,
       mental_models_recommended: 3
     },
-    biases: [
+    blindSpots: [
       {
-        name: "Confirmation Bias",
-        type: "bias" as const,
+        name: "Confirmation Blind Spot",
+        type: "blind_spot" as const,
         severity: "high" as const,
         description: "Found in meeting when team only discussed positive market research, ignoring competitive threats mentioned in uploaded competitor analysis document.",
         snippet: "I agree, the market research looks promising. We've seen similar products succeed.",
         recommendedModels: ["Inversion Thinking", "First Principles"]
       },
       {
-        name: "Optimism Bias",
-        type: "bias" as const,
+        name: "Optimism Blind Spot",
+        type: "blind_spot" as const,
         severity: "high" as const,
         description: "Detected when CEO stated '40% revenue increase' without discussing potential risks outlined in financial projections document.",
         snippet: "I think we can achieve a 40% revenue increase if we execute well.",
         recommendedModels: ["Inversion Thinking", "Systems Thinking"]
       },
       {
-        name: "Anchoring Bias",
-        type: "bias" as const,
+        name: "Anchoring Blind Spot",
+        type: "blind_spot" as const,
         severity: "medium" as const,
         description: "Identified when discussion anchored on initial $2M budget figure from uploaded budget template, limiting exploration of alternatives.",
         snippet: "What about the budget? We're looking at about $2M investment.",
@@ -65,7 +65,7 @@ const mockDecisionData = {
     framework: {
       name: "Pros & Cons Matrix",
       description: "A structured decision-making tool that systematically lists positive and negative aspects of a choice.",
-      why_recommended: "Addresses: Confirmation Bias, Optimism Bias",
+      why_recommended: "Addresses: Confirmation Blind Spot, Optimism Blind Spot",
       how_to_use: [
         "List all potential positive outcomes in the 'Pros' column",
         "List all potential negative outcomes in the 'Cons' column",
@@ -124,13 +124,12 @@ January 15, 2025
 };
 
 export const DecisionDetail = () => {
-  const { id } = useParams();
+  const { projectId, decisionId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const [highlightedModel, setHighlightedModel] = useState<string>("");
   const [highlightedText, setHighlightedText] = useState<string>("");
   
-  const decision = mockDecisionData[Number(id) as keyof typeof mockDecisionData];
+  const decision = mockDecisionData[Number(decisionId) as keyof typeof mockDecisionData];
 
   if (!decision) {
     return <div>Decision not found</div>;
@@ -158,10 +157,10 @@ export const DecisionDetail = () => {
 
   const highlightTranscript = (text: string) => {
     if (!highlightedText) return text;
-
+    
     const index = text.indexOf(highlightedText);
     if (index === -1) return text;
-
+    
     return (
       <>
         {text.substring(0, index)}
@@ -177,13 +176,13 @@ export const DecisionDetail = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(`/project/${projectId}`)}
           className="mb-6 flex items-center gap-2 hover:bg-gray-100"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to My Decisions
+          Back to Project
         </Button>
 
         {/* Header */}
@@ -234,7 +233,7 @@ export const DecisionDetail = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InsightCard
               title="Detected Blind Spots"
-              items={decision.biases}
+              items={decision.blindSpots}
               icon="eye"
               onSnippetClick={handleSnippetClick}
               onModelClick={handleModelClick}

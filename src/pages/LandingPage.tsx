@@ -19,7 +19,7 @@ export const LandingPage = () => {
 
   const handleGetStarted = () => {
     if (isSignedIn) {
-      navigate("/dashboard");
+      navigate("/projects");
     } else {
       // This will trigger Clerk's sign-up flow
       window.location.href = "/sign-up";
@@ -80,7 +80,7 @@ export const LandingPage = () => {
             <div className="flex items-center">
               <div className="flex items-center space-x-2">
                 <Lightbulb className="h-8 w-8 text-blue-600" />
-                <span className="text-xl font-bold text-gray-900">Clarily</span>
+                <span className="text-xl font-bold text-gray-900">Clarily Judgment Coach</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -94,8 +94,8 @@ export const LandingPage = () => {
                   </Button>
                 </>
               ) : (
-                <Button onClick={() => navigate("/dashboard")}>
-                  Go to Dashboard
+                <Button onClick={() => navigate("/projects")}>
+                  Go to Projects
                 </Button>
               )}
             </div>
@@ -112,7 +112,7 @@ export const LandingPage = () => {
               <span className="text-blue-600"> Decision Making</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Clarily uses AI to analyze your meeting transcripts and extract key decisions, 
+              Clarily Judgment Coach uses AI to analyze your meeting transcripts and extract key decisions, 
               helping you track, manage, and learn from your strategic choices.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -136,7 +136,7 @@ export const LandingPage = () => {
               Everything you need to make better decisions
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From AI-powered analysis to comprehensive tracking, Clarily provides the tools 
+              From AI-powered analysis to comprehensive tracking, Clarily Judgment Coach provides the tools 
               you need to improve your decision-making process.
             </p>
           </div>
@@ -162,7 +162,7 @@ export const LandingPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Why teams choose Clarily
+                Why teams choose Clarily Judgment Coach
               </h2>
               <div className="space-y-4">
                 {benefits.map((benefit, index) => (
@@ -204,7 +204,7 @@ export const LandingPage = () => {
             Ready to improve your decision making?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of teams using Clarily to make better, faster decisions.
+            Join thousands of teams using Clarily Judgment Coach to make better, faster decisions.
           </p>
           <Button size="lg" variant="secondary" onClick={handleGetStarted} className="text-lg px-8 py-3">
             Get Started Today
@@ -220,7 +220,7 @@ export const LandingPage = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Lightbulb className="h-6 w-6 text-blue-400" />
-                <span className="text-lg font-bold">Clarily</span>
+                <span className="text-lg font-bold">Clarily Judgment Coach</span>
               </div>
               <p className="text-gray-400">
                 Transform your decision-making process with AI-powered insights.
@@ -255,7 +255,7 @@ export const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Clarily. All rights reserved.</p>
+            <p>&copy; 2024 Clarily Judgment Coach. All rights reserved.</p>
           </div>
         </div>
       </footer>

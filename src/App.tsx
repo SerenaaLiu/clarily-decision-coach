@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ClerkProvider, SignIn, SignUp } from "@clerk/clerk-react";
-import { Dashboard } from "./pages/Dashboard";
+import { Projects } from "./pages/Projects";
+import { ProjectDetail } from "./pages/ProjectDetail";
 import { DecisionDetail } from "./pages/DecisionDetail";
 import { LandingPage } from "./pages/LandingPage";
 import { ArchivedDecisions } from "./pages/ArchivedDecisions";
@@ -34,7 +35,7 @@ const App = () => (
               path="/sign-in/*"
               element={
                 <CenteredAuthPage>
-                  <SignIn routing="path" path="/sign-in" afterSignInUrl="/dashboard" />
+                  <SignIn routing="path" path="/sign-in" afterSignInUrl="/projects" />
                 </CenteredAuthPage>
               }
             />
@@ -45,22 +46,30 @@ const App = () => (
                   <SignUp 
                     routing="path" 
                     path="/sign-up" 
-                    afterSignUpUrl="/dashboard" 
-                    afterSignInUrl="/dashboard"
+                    afterSignUpUrl="/projects" 
+                    afterSignInUrl="/projects"
                   />
                 </CenteredAuthPage>
               }
             />
             <Route 
-              path="/dashboard" 
+              path="/projects" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <Projects />
                 </ProtectedRoute>
               } 
             />
             <Route 
-              path="/decision/:id" 
+              path="/project/:id" 
+              element={
+                <ProtectedRoute>
+                  <ProjectDetail />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/project/:projectId/decision/:decisionId" 
               element={
                 <ProtectedRoute>
                   <DecisionDetail />
