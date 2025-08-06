@@ -9,6 +9,14 @@ interface FrameworkCardProps {
     cons?: string[];
     criteria?: { name: string; score: number }[];
     steps?: string[];
+    strengths?: string[];
+    weaknesses?: string[];
+    opportunities?: string[];
+    threats?: string[];
+    high_reward_low_risk?: string[];
+    high_reward_high_risk?: string[];
+    low_reward_low_risk?: string[];
+    low_reward_high_risk?: string[];
   };
 }
 
@@ -72,10 +80,114 @@ export const FrameworkCard = ({ name, content }: FrameworkCardProps) => {
     </ol>
   );
 
+  const renderSWOTAnalysis = () => (
+    <div className="grid grid-cols-2 gap-4">
+      <div>
+        <h4 className="font-semibold text-green-700 mb-3">Strengths</h4>
+        <ul className="space-y-2">
+          {content.strengths?.map((strength, index) => (
+            <li key={index} className="flex items-start gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+              <span className="text-gray-700 text-sm">{strength}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h4 className="font-semibold text-red-700 mb-3">Weaknesses</h4>
+        <ul className="space-y-2">
+          {content.weaknesses?.map((weakness, index) => (
+            <li key={index} className="flex items-start gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
+              <span className="text-gray-700 text-sm">{weakness}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h4 className="font-semibold text-blue-700 mb-3">Opportunities</h4>
+        <ul className="space-y-2">
+          {content.opportunities?.map((opportunity, index) => (
+            <li key={index} className="flex items-start gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+              <span className="text-gray-700 text-sm">{opportunity}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h4 className="font-semibold text-orange-700 mb-3">Threats</h4>
+        <ul className="space-y-2">
+          {content.threats?.map((threat, index) => (
+            <li key={index} className="flex items-start gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 flex-shrink-0" />
+              <span className="text-gray-700 text-sm">{threat}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+
+  const renderRiskRewardMatrix = () => (
+    <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-4">
+        <div>
+          <h4 className="font-semibold text-green-700 mb-2">High Reward, Low Risk</h4>
+          <ul className="space-y-1">
+            {content.high_reward_low_risk?.map((item, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-semibold text-blue-700 mb-2">High Reward, High Risk</h4>
+          <ul className="space-y-1">
+            {content.high_reward_high_risk?.map((item, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="space-y-4">
+        <div>
+          <h4 className="font-semibold text-gray-600 mb-2">Low Reward, Low Risk</h4>
+          <ul className="space-y-1">
+            {content.low_reward_low_risk?.map((item, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-500 mt-2 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-semibold text-red-700 mb-2">Low Reward, High Risk</h4>
+          <ul className="space-y-1">
+            {content.low_reward_high_risk?.map((item, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     if (content.pros || content.cons) return renderProsConsMatrix();
     if (content.criteria) return renderCriteriaMatrix();
     if (content.steps) return renderStepsList();
+    if (content.strengths || content.weaknesses || content.opportunities || content.threats) return renderSWOTAnalysis();
+    if (content.high_reward_low_risk || content.high_reward_high_risk || content.low_reward_low_risk || content.low_reward_high_risk) return renderRiskRewardMatrix();
     return null;
   };
 

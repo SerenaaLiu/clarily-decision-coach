@@ -2,9 +2,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { InsightCard } from "@/components/InsightCard";
 import { FrameworkCard } from "@/components/FrameworkCard";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, ChevronDown, ChevronRight, Eye, Plus } from "lucide-react";
 
 const mockDecisionData = {
   1: {
@@ -17,7 +18,7 @@ const mockDecisionData = {
       mental_models_recommended: 3
     },
     blindSpots: [
-      {
+      { 
         name: "Confirmation Blind Spot",
         type: "blind_spot" as const,
         severity: "high" as const,
@@ -25,7 +26,7 @@ const mockDecisionData = {
         snippet: "I agree, the market research looks promising. We've seen similar products succeed.",
         recommendedModels: ["Inversion Thinking", "First Principles"]
       },
-      {
+      { 
         name: "Optimism Blind Spot",
         type: "blind_spot" as const,
         severity: "high" as const,
@@ -33,7 +34,7 @@ const mockDecisionData = {
         snippet: "I think we can achieve a 40% revenue increase if we execute well.",
         recommendedModels: ["Inversion Thinking", "Systems Thinking"]
       },
-      {
+      { 
         name: "Anchoring Blind Spot",
         type: "blind_spot" as const,
         severity: "medium" as const,
@@ -43,29 +44,30 @@ const mockDecisionData = {
       }
     ],
     mentalModels: [
-      {
-        name: "Inversion Thinking",
+      { 
+        name: "Inversion Thinking", 
         type: "model" as const,
         description: "Think about what could go wrong first to identify potential pitfalls. This often involves exploring worst-case scenarios and systematically examining failure modes before committing to a decision.",
         process: "Develop best/worst/most likely scenarios"
       },
-      {
-        name: "First Principles",
+      { 
+        name: "First Principles", 
         type: "model" as const,
         description: "Break down complex problems to their fundamental truths and build up solutions from basic components. This involves questioning assumptions and reasoning from foundational elements rather than analogy.",
         process: "Question core assumptions and build from foundational elements"
       },
-      {
-        name: "Systems Thinking",
+      { 
+        name: "Systems Thinking", 
         type: "model" as const,
         description: "Consider how different parts of the business will interact and affect each other with this decision. This involves understanding feedback loops, unintended consequences, and holistic impact across the organization.",
         process: "Map interconnections and feedback loops"
       }
     ],
-    framework: {
+    frameworks: {
+      "pros-cons": {
       name: "Pros & Cons Matrix",
       description: "A structured decision-making tool that systematically lists positive and negative aspects of a choice.",
-      why_recommended: "Addresses: Confirmation Blind Spot, Optimism Blind Spot",
+        why_recommended: "Addresses: Confirmation Blind Spot, Optimism Blind Spot",
       how_to_use: [
         "List all potential positive outcomes in the 'Pros' column",
         "List all potential negative outcomes in the 'Cons' column",
@@ -84,6 +86,67 @@ const mockDecisionData = {
           "Resource allocation from other projects",
           "Timeline is aggressive for Q4 launch"
         ]
+        }
+      },
+      "swot": {
+        name: "SWOT Analysis",
+        description: "A strategic planning tool that evaluates Strengths, Weaknesses, Opportunities, and Threats.",
+        why_recommended: "Addresses: Anchoring Blind Spot, Confirmation Blind Spot",
+        how_to_use: [
+          "Identify internal Strengths and Weaknesses",
+          "Analyze external Opportunities and Threats",
+          "Use insights to inform strategic decisions"
+        ],
+        content: {
+          strengths: [
+            "Strong technical team with relevant experience",
+            "Existing customer base and brand recognition",
+            "Proven product development process"
+          ],
+          weaknesses: [
+            "Limited marketing budget for new features",
+            "Small team size for aggressive timeline",
+            "Limited experience in target market segment"
+          ],
+          opportunities: [
+            "Growing market demand for our product type",
+            "Potential for strategic partnerships",
+            "First-mover advantage in specific niche"
+          ],
+          threats: [
+            "Intensifying competition from larger players",
+            "Economic uncertainty affecting customer spending",
+            "Rapid technology changes in our space"
+          ]
+        }
+      },
+      "risk-reward": {
+        name: "Risk-Reward Matrix",
+        description: "A framework to evaluate potential risks against expected rewards for different options.",
+        why_recommended: "Addresses: Optimism Blind Spot, Anchoring Blind Spot",
+        how_to_use: [
+          "Plot different options on risk vs. reward axes",
+          "Consider probability and impact of each risk",
+          "Choose options with optimal risk-reward balance"
+        ],
+        content: {
+          high_reward_low_risk: [
+            "Incremental feature improvements",
+            "Customer feedback integration"
+          ],
+          high_reward_high_risk: [
+            "Major new product launch",
+            "Market expansion to new regions"
+          ],
+          low_reward_low_risk: [
+            "Minor UI improvements",
+            "Documentation updates"
+          ],
+          low_reward_high_risk: [
+            "Complete product redesign",
+            "Entry into unrelated markets"
+          ]
+        }
       }
     },
     guiding_questions_for_next_discussion: [
@@ -128,6 +191,8 @@ export const DecisionDetail = () => {
   const navigate = useNavigate();
   const [highlightedModel, setHighlightedModel] = useState<string>("");
   const [highlightedText, setHighlightedText] = useState<string>("");
+  const [isBlindSpotsOpen, setIsBlindSpotsOpen] = useState(false);
+  const [activeFramework, setActiveFramework] = useState<keyof typeof mockDecisionData[number]["frameworks"]>("pros-cons");
   
   const decision = mockDecisionData[Number(decisionId) as keyof typeof mockDecisionData];
 
@@ -198,6 +263,53 @@ export const DecisionDetail = () => {
           </CardHeader>
         </Card>
 
+        {/* Decision Summary */}
+        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-blue-900">
+              Decision Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Key Decision Points</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 font-medium">•</span>
+                      <span>Q4 product strategy direction and feature prioritization</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 font-medium">•</span>
+                      <span>Resource allocation for new feature development</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 font-medium">•</span>
+                      <span>Market expansion strategy and competitive positioning</span>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Decision Context</h4>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <p><span className="font-medium">Budget:</span> $2M investment required</p>
+                    <p><span className="font-medium">Timeline:</span> Q4 launch target</p>
+                    <p><span className="font-medium">Team:</span> 15 developers available</p>
+                    <p><span className="font-medium">Risk Level:</span> Medium-High</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <p className="text-sm text-blue-900 font-medium">
+                  <span className="font-semibold">Primary Decision:</span> Proceed with Q4 product strategy including new feature set, 
+                  with 40% projected revenue increase and 6-month break-even timeline.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Summary */}
         <Card className="mb-8 bg-blue-50 border-blue-200">
           <CardHeader>
@@ -230,69 +342,240 @@ export const DecisionDetail = () => {
         {/* Core Insights */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Core Clarily Insights from Meeting</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InsightCard
-              title="Detected Blind Spots"
-              items={decision.blindSpots}
-              icon="eye"
-              onSnippetClick={handleSnippetClick}
-              onModelClick={handleModelClick}
-            />
-            <InsightCard
-              title="Suggested Mental Models"
-              items={decision.mentalModels}
-              icon="brain"
-              highlightedModel={highlightedModel}
-            />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Main Body */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Framework Selector Cards */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-gray-900">Generated Frameworks</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Pros & Cons Card */}
+                  <Card 
+                    className={`cursor-pointer transition-all hover:shadow-md ${
+                      activeFramework === "pros-cons" 
+                        ? "ring-2 ring-blue-500 bg-blue-50" 
+                        : "hover:bg-gray-50"
+                    }`}
+                    onClick={() => setActiveFramework("pros-cons")}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <CardTitle className="text-base font-semibold text-gray-900">
+                          Pros & Cons Matrix
+                        </CardTitle>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Weigh advantages and disadvantages systematically
+                      </p>
+                      <div className="mt-3">
+                        <p className="text-xs font-medium text-gray-700">Best for:</p>
+                        <p className="text-xs text-gray-600">Binary decisions, clear trade-offs</p>
+                      </div>
+                    </CardHeader>
+                  </Card>
+
+                  {/* SWOT Card */}
+                  <Card 
+                    className={`cursor-pointer transition-all hover:shadow-md ${
+                      activeFramework === "swot" 
+                        ? "ring-2 ring-blue-500 bg-blue-50" 
+                        : "hover:bg-gray-50"
+                    }`}
+                    onClick={() => setActiveFramework("swot")}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                        </div>
+                        <CardTitle className="text-base font-semibold text-gray-900">
+                          SWOT Analysis
+                        </CardTitle>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Evaluate internal and external factors comprehensively
+                      </p>
+                      <div className="mt-3">
+                        <p className="text-xs font-medium text-gray-700">Best for:</p>
+                        <p className="text-xs text-gray-600">Strategic planning, competitive analysis</p>
+                      </div>
+                    </CardHeader>
+                  </Card>
+
+                  {/* Risk-Reward Card */}
+                  <Card 
+                    className={`cursor-pointer transition-all hover:shadow-md ${
+                      activeFramework === "risk-reward" 
+                        ? "ring-2 ring-blue-500 bg-blue-50" 
+                        : "hover:bg-gray-50"
+                    }`}
+                    onClick={() => setActiveFramework("risk-reward")}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                          </svg>
+                        </div>
+                        <CardTitle className="text-base font-semibold text-gray-900">
+                          Risk-Reward Matrix
+                        </CardTitle>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Map options by risk level and potential reward
+                      </p>
+                      <div className="mt-3">
+                        <p className="text-xs font-medium text-gray-700">Best for:</p>
+                        <p className="text-xs text-gray-600">Investment decisions, portfolio planning</p>
+                      </div>
+                    </CardHeader>
+                  </Card>
           </div>
         </div>
 
-        {/* Generated Framework */}
-        <div className="mb-8">
+              {/* Selected Framework Content */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-900">
-                Generated Framework: {decision.framework.name}
+                  <CardTitle className="text-lg font-semibold text-gray-900">
+                    {decision.frameworks[activeFramework].name}
               </CardTitle>
-              <p className="text-gray-600 text-sm mt-2">{decision.framework.description}</p>
+                  <p className="text-gray-600 text-sm">
+                    {decision.frameworks[activeFramework].description}
+                  </p>
               <div className="bg-blue-50 text-blue-800 text-sm px-3 py-2 rounded-lg mt-3 font-medium">
-                {decision.framework.why_recommended}
+                    {decision.frameworks[activeFramework].why_recommended}
               </div>
             </CardHeader>
             <CardContent>
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">How to Use:</h4>
-                <ol className="space-y-2">
-                  {decision.framework.how_to_use.map((step, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full min-w-[24px] text-center">
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-gray-900 mb-2">How to Use:</h4>
+                    <ol className="space-y-1">
+                      {decision.frameworks[activeFramework].how_to_use.map((step, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full min-w-[20px] text-center">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-gray-700">{step}</span>
+                          <span>{step}</span>
                     </li>
                   ))}
                 </ol>
               </div>
               <FrameworkCard
-                name={decision.framework.name}
-                content={decision.framework.content}
+                    name={decision.frameworks[activeFramework].name}
+                    content={decision.frameworks[activeFramework].content}
               />
             </CardContent>
           </Card>
-        </div>
 
-        {/* Guiding Questions */}
-        <div className="mb-8">
+              {/* Action Items */}
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-gray-900">
+                    Action Items
+                  </CardTitle>
+                  <p className="text-gray-600 text-sm mt-2">
+                    Specific next steps and deliverables identified from this decision
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-3">Immediate Actions (This Week)</h4>
+                        <ul className="space-y-3">
+                          <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">Finalize Q4 product roadmap</p>
+                              <p className="text-xs text-gray-600">Owner: Sarah Johnson | Due: Friday</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">Conduct competitive analysis</p>
+                              <p className="text-xs text-gray-600">Owner: Lisa Rodriguez | Due: Thursday</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">Prepare budget breakdown</p>
+                              <p className="text-xs text-gray-600">Owner: David Kim | Due: Wednesday</p>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-3">Strategic Actions (Next 2 Weeks)</h4>
+                        <ul className="space-y-3">
+                          <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">Develop risk mitigation plan</p>
+                              <p className="text-xs text-gray-600">Owner: Mike Chen | Due: Next Friday</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">Create stakeholder communication plan</p>
+                              <p className="text-xs text-gray-600">Owner: Sarah Johnson | Due: Next Monday</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">Set up progress tracking system</p>
+                              <p className="text-xs text-gray-600">Owner: Lisa Rodriguez | Due: Next Tuesday</p>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <h4 className="font-semibold text-yellow-900 mb-2">Key Deliverables</h4>
+                      <ul className="space-y-2 text-sm text-yellow-800">
+                        <li>• Q4 Product Roadmap Document</li>
+                        <li>• Competitive Analysis Report</li>
+                        <li>• Budget Allocation Spreadsheet</li>
+                        <li>• Risk Mitigation Strategy</li>
+                        <li>• Stakeholder Communication Plan</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column - Supplemental Insights */}
+            <div className="space-y-6">
+              {/* Mental Models */}
+              <InsightCard
+                title="Suggested Mental Models"
+                items={decision.mentalModels}
+                icon="brain"
+                highlightedModel={highlightedModel}
+              />
+
+              {/* Guiding Questions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-gray-900">
                 Guiding Questions for Your Next Discussion
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Based on our analysis of this meeting, consider these questions to enhance your team's judgment in the next session:
-              </p>
               <ul className="space-y-3 text-sm text-gray-700">
                 {decision.guiding_questions_for_next_discussion.map((question, index) => (
                   <li key={index} className="flex items-start gap-2">
@@ -303,22 +586,44 @@ export const DecisionDetail = () => {
               </ul>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Full Meeting Transcript */}
-        <div id="transcript-section" className="mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-900">
-                Full Meeting Transcript
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="whitespace-pre-line text-sm text-gray-700 font-mono bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-                {highlightTranscript(decision.transcript)}
+              {/* Collapsible Blind Spots */}
+              <Collapsible open={isBlindSpotsOpen} onOpenChange={setIsBlindSpotsOpen}>
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-between p-4 hover:bg-gray-50 border border-gray-200 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Eye className="h-4 w-4 text-orange-600" />
+                      <div className="text-left">
+                        <h3 className="font-medium text-gray-900">Detected Blind Spots</h3>
+                        <p className="text-xs text-gray-600">
+                          {decision.blindSpots.length} blind spot{decision.blindSpots.length !== 1 ? 's' : ''} found
+                        </p>
+                      </div>
+                    </div>
+                    {isBlindSpotsOpen ? (
+                      <ChevronDown className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="mt-4">
+                    <InsightCard
+                      title=""
+                      items={decision.blindSpots}
+                      icon="eye"
+                      onSnippetClick={handleSnippetClick}
+                      onModelClick={handleModelClick}
+                    />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+        </div>
               </div>
-            </CardContent>
-          </Card>
         </div>
 
       </div>
